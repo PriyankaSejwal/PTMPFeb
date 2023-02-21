@@ -367,6 +367,7 @@ function calculateTx(angle, i) {
   }
   var eirpVal = [
     slaveTx + mRadio + slaveRadio - 4,
+    // change this mRadio to original mRadio value if master doesnot gets affected even when slave is at the ends of the main lobe
     masterTx + mRadio + slaveRadio - 4,
   ];
   console.log(eirpVal);
