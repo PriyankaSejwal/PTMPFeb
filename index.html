@@ -48,7 +48,7 @@
                   name=""
                   id="numberOfSlaves"
                   class="select"
-                  onchange="createSlavesCoordinateField();createSlavesField()"
+                  onchange="createSlavesCoordinateField();createSlavesField(); createMasterTable()"
                 >
                   <option value="" disabled selected>Number of Slaves</option>
                   <option value="1">1</option>
@@ -168,6 +168,45 @@
                 <label for="" class="label">Height</label>
                 <input type="text" placeholder="Height" id="masterHeight" />
               </div>
+            </div>
+            <div class="masterTableDiv">
+              <table
+                id="masterTable"
+                class="table table-condensed table-striped"
+              >
+                <tbody>
+                  <tr>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <th>Azimuth</th>
+                  </tr>
+                  <tr>
+                    <th>RSL</th>
+                  </tr>
+                  <tr>
+                    <th>Snr</th>
+                  </tr>
+                  <tr>
+                    <th>Fade Margin</th>
+                  </tr>
+                  <tr>
+                    <th>Mcs</th>
+                  </tr>
+                  <tr>
+                    <th>Modulation</th>
+                  </tr>
+                  <tr>
+                    <th>FEC</th>
+                  </tr>
+                  <tr>
+                    <th>Link Rate</th>
+                  </tr>
+                  <tr>
+                    <th>Throughput</th>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -778,6 +817,7 @@
     <script src="functions.js"></script>
     <script src="onchange.js"></script>
     <script src="masterparams.js"></script>
+    <script src="createMTable.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?sensor=false&callback=initMap"></script>
     <!-- <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"

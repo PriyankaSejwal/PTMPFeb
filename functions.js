@@ -88,10 +88,6 @@ function createSlavesCoordinateField() {
         }
         var coordslave = this.value.split(",");
         var [lat, long] = coordslave;
-        // calling the function which calculates the parameters
-        azimuth(parseFloat(lat), parseFloat(long), i);
-
-        console.log(masterAzimuthArray);
 
         // Placing marker for each lat long of slave
         marker[i] = new google.maps.Marker({
@@ -101,6 +97,9 @@ function createSlavesCoordinateField() {
         });
         bounds.extend({ lat: parseFloat(lat), lng: parseFloat(long) });
         map.fitBounds(bounds);
+
+        // calling the function which calculates the parameters
+        azimuth(parseFloat(lat), parseFloat(long), i);
       });
   }
 }
@@ -129,7 +128,8 @@ function createSlavesField() {
     var slavedivIn = document.createElement("div");
     slavedivIn.className = "inputSection";
     slavedivIn.setAttribute("id", `slave${i}Inputs`);
-    inputArray = ["Radio", "Height", "Gain", "Tx Power"];
+    var inputArray = ["Radio", "Height", "Gain", "Tx Power"];
+    var nameArray = ["Radio", "Height", "Gain", "Tx"];
     for (let j = 0; j < inputArray.length; j++) {
       // creating a div with class item
       var slaveitem1 = document.createElement("div");
@@ -162,7 +162,7 @@ function createSlavesField() {
         default:
           var slaveinput = document.createElement("input");
           slaveinput.setAttribute("type", "text");
-          slaveinput.setAttribute("id", `slave${i}` + inputArray[j]);
+          slaveinput.setAttribute("id", `slave${i}` + nameArray[j]);
           slaveinput.setAttribute("placeholder", inputArray[j]);
       }
 
@@ -178,7 +178,7 @@ function createSlavesField() {
 
     // Populating the value of antgain and txpower in the fields
     document.getElementById(`slave${i}Gain`).value = 23;
-    document.getElementById(`slave${i}Tx Power`).value = 27;
+    document.getElementById(`slave${i}Tx`).value = 27;
 
     // function called to create slave output fields
     createOutputTables(
@@ -237,9 +237,9 @@ function createSlavesField() {
     // Second event listener to change the parameters when tx power will change
     // This will not impact the calculations for the slave as slave tx power is used to calculate the rsl of Master
     document
-      .getElementById(`slave${i}Tx Power`)
+      .getElementById(`slave${i}Tx`)
       .addEventListener("change", function () {
-        var slaveTx = document.getElementById(`slave${i}Tx Power`).value;
+        var slaveTx = document.getElementById(`slave${i}Tx`).value;
         console.log(slaveTx);
       });
   }
@@ -260,19 +260,22 @@ function createOutputTables(
     ["SNR", "Fade Margin"],
     ["MCS", "Modulation"],
     ["FEC", "Link Rate"],
-    ["Throughput", "In Range"],
+    ["Throughput", "PTMP Throughput"],
+    ["In Range"],
   ];
   $("<table>", { id: `slave${i}Table`, class: "table" }).appendTo(
     $(`#tableDiv${i}`)
   );
   for (let k = 0; k < tableArr.length; k++) {
-    $("<tr>", { id: `Slave${i}row${k + 1}` }).appendTo($(`#slave${i}Table`));
+    $("<tr>").appendTo($(`#slave${i}Table`));
     for (let j = 0; j <= 1; j++) {
-      $("<th>", { html: tableArr[k][j] }).appendTo($(`#Slave${i}row${k + 1}`));
+      $("<th>", { html: tableArr[k][j] }).appendTo(
+        $(`#slave${i}Table tr:nth-child(${k + 1})`)
+      );
       $("<td>", {
-        id: `slave${i}` + tableArr[k][j],
+        id: tableArr[k][j] + `${i}1`,
         html: "hello",
-      }).appendTo($(`#Slave${i}row${k + 1}`));
+      }).appendTo($(`#slave${i}Table tr:nth-child(${k + 1})`));
     }
   }
   slaveSectionBorder.append(slaveInputSection);
@@ -280,52 +283,6 @@ function createOutputTables(
 }
 
 // function to create output fields
-function createOutputFields(
-  slaveInputSection,
-  slaveSectionBorder,
-  slavecontainer,
-  i
-) {
-  var outputheader = document.createElement("header");
-  outputheader.innerHTML = "Outputs";
-  // Slave Div for outputs/results
-  var slaveDivOut = document.createElement("div");
-  slaveDivOut.className = "outputsection";
-  slaveDivOut.setAttribute("id", `slave${i}Outputs`);
-  outputArray = [
-    "HAngle",
-    "Distance",
-    "Fresnel",
-    "RSL",
-    "SNR",
-    "Fade Margin",
-    "MCS",
-    "Modulation",
-    "FEC",
-    "Link Rate",
-    "Throughput",
-    "H Range",
-    "V Range",
-  ];
-  for (let j = 0; j < outputArray.length; j++) {
-    var slaveitem2 = document.createElement("div");
-    slaveitem2.className = "item";
-    // created a label for the slave name
-    var slavelabel = document.createElement("LABEL");
-    var text = document.createTextNode(outputArray[j]);
-    slavelabel.appendChild(text);
-    slavelabel.className = "label";
-    var slaveoutput = document.createElement("span");
-    slaveoutput.className = "slavespan";
-    slaveoutput.setAttribute("id", `slave${i}` + outputArray[j]);
-
-    slaveitem2.append(slavelabel, slaveoutput);
-    slaveDivOut.append(slaveitem2);
-  }
-  slaveInputSection.append(slaveDivOut);
-  slaveSectionBorder.append(slaveInputSection);
-  slavecontainer.append(slaveSectionBorder);
-}
 
 function deg2rad(deg) {
   return deg * (Math.PI / 180);
@@ -365,7 +322,7 @@ function azimuth(slavelat, slavelong, i) {
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var distance = Math.round(R * c * 100) / 100; // Distance in km
   // Populating the value of distance
-  document.querySelector(`#slave${i}Distance`).innerHTML = distance;
+  document.querySelector(`#Distance${i}1`).innerHTML = distance;
 
   // Azimuth Calculation
   var y = Math.sin(slaveLong - masterLong) * Math.cos(slaveLat);
@@ -381,21 +338,13 @@ function azimuth(slavelat, slavelong, i) {
   masterAzimuthArray[i - 1] = anglea;
   console.log(masterAzimuthArray);
 
-  // RSL calculation
-  // var rsl = (
-  //   masterTx +
-  //   masterRadio +
-  //   slaveRadio -
-  //   4 -
-  //   (20 * Math.log10(distance) + 20 * Math.log10(cf / 1000) + 92.45)
-  // ).toFixed(2);
-
   // fresnel radius calculation
   var fres = (17.32 * Math.sqrt(distance / ((4 * cf) / 1000))).toFixed(2);
 
   //  Populating values if azimuth, hop distance and fresnel
-  document.querySelector(`#slave${i}Azimuth`).innerHTML = angleb;
-  document.getElementById(`slave${i}Fresnel Radius`).innerHTML = fres;
+  document.querySelector(`#Azimuth${i}0`).innerHTML = anglea;
+  document.querySelector(`#Azimuth${i}1`).innerHTML = angleb;
+  document.getElementById(`Fresnel Radius${i}1`).innerHTML = fres;
   // document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
 
   // function called to check whether slave is in Master Range
@@ -407,7 +356,8 @@ function calculateTx(angle, i) {
   var mRadio = parseFloat($("#masterRadio").val());
   var masterTx = parseFloat($("#masterTxPower").val());
   var slaveRadio = parseFloat($(`#slave${i}Radio`).val());
-  var hopDist = parseFloat($(`#slave${i}Distance`).html());
+  var slaveTx = parseFloat($(`#slave${i}Tx`).val());
+  var hopDist = parseFloat($(`#Distance${i}1`).html());
   var cf = $("#channelFreq").val();
   console.log(mRadio, masterTx, slaveRadio, hopDist, cf);
 
@@ -415,19 +365,23 @@ function calculateTx(angle, i) {
   if ((angle >= 330 && angle <= 335) || (angle >= 25 && angle <= 30)) {
     mRadio = mRadio * 0.2;
   }
-  //  RSL calculation
-  rsl = (
-    masterTx +
-    mRadio +
-    slaveRadio -
-    4 -
-    (20 * Math.log10(hopDist) + 20 * Math.log10(cf / 1000) + 92.45)
-  ).toFixed(2);
+  var eirpVal = [
+    slaveTx + mRadio + slaveRadio - 4,
+    masterTx + mRadio + slaveRadio - 4,
+  ];
+  console.log(eirpVal);
+  for (let j = 0; j <= 1; j++) {
+    //  RSL calculation
+    rsl =
+      parseFloat(eirpVal[j]) -
+      (20 * Math.log10(hopDist) + 20 * Math.log10(cf / 1000) + 92.45).toFixed(
+        2
+      );
+    console.log("RSLs: ", rsl);
 
-  //  Populating the value of RSL
-  document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
-  // return mTx;
-  return rsl;
+    //  Populating the value of RSL
+    document.querySelector(`#RSL${i}${j}`).innerHTML = rsl.toFixed(2);
+  }
 }
 
 // function azimuthangle(slavelat, slavelong, i) {
@@ -556,12 +510,12 @@ function checkMasterRange() {
         var changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        var hopDist = document.querySelector(`#slave${i}Distance`).innerHTML;
+        var hopDist = document.querySelector(`#Distance${i}1`).innerHTML;
         // checking if the changed angle will make a change to the txpower and the calculations followed
 
-        rsl = calculateTx(changedAngle, i);
+        calculateTx(changedAngle, i);
         //  calling function to calculate SNR etc
-        calcSNR(rsl, i);
+        calcSNR(i);
 
         // This one to check for the Range
 
@@ -576,20 +530,49 @@ function checkMasterRange() {
           (changedAngle > 0 && changedAngle < 30)
         ) {
           if (hopDist <= 5) {
-            document.getElementById(`slave${i}In Range`).innerHTML = "Yes";
-            document.querySelector(`#slave${i}Distance`).style.color = "Green";
-            document.querySelector(`#slave${i}Azimuth`).style.color = "Green";
+            document.getElementById(`In Range${i}1`).innerHTML = "Yes";
+            document.querySelector(`#Distance${i}1`).style.color = "Green";
+            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
           } else {
-            document.getElementById(`slave${i}In Range`).innerHTML = "No";
-            document.querySelector(`#slave${i}Distance`).style.color = "Red";
-            document.querySelector(`#slave${i}Azimuth`).style.color = "Green";
+            document.getElementById(`In Range${i}1`).innerHTML = "No";
+            document.querySelector(`#Distance${i}1`).style.color = "Red";
+            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
           }
         } else {
-          document.getElementById(`slave${i}In Range`).innerHTML = "No";
-          document.querySelector(`#slave${i}Azimuth`).style.color = "Red";
-          document.querySelector(`#slave${i}Distance`).style.color = "Black";
+          document.getElementById(`In Range${i}1`).innerHTML = "No";
+          document.querySelector(`#Azimuth${i}1`).style.color = "Red";
+          document.querySelector(`#Distance${i}1`).style.color = "Black";
         }
       }
     }
   }
+}
+
+//  function which will calculate the throughput for the slaves in a PTMP arrangement.
+function throughputPTMP() {
+  var numOfSlaves = $("#numberOfSlaves").val();
+  var throughputArr = [];
+  var weightedThroughputArr = [];
+  var total = 0;
+  if ($(`#Throughput${eval(numOfSlaves)}1`).html() != "") {
+    for (let i = 1; i <= numOfSlaves; i++) {
+      var slaveThghpt = $(`#Throughput${i}1`).html();
+      console.log(slaveThghpt);
+      throughputArr[i - 1] = parseFloat(slaveThghpt) / 2;
+      total += throughputArr[i - 1];
+    }
+    console.log(total);
+    for (let i = 1; i <= numOfSlaves; i++) {
+      var weightedPercent = throughputArr[i - 1] / total;
+      console.log(weightedPercent);
+      var weightedThroughput = (weightedPercent * throughputArr[i - 1]).toFixed(
+        2
+      );
+      document.getElementById(`PTMP Throughput${i}1`).innerHTML =
+        weightedThroughput;
+      weightedThroughputArr[i - 1] = weightedThroughput;
+    }
+  }
+
+  console.log(weightedThroughputArr);
 }

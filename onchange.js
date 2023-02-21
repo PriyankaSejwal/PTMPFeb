@@ -32,8 +32,8 @@ function masterRadioChanged() {
         changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        rsl = calculateTx(changedAngle, i);
-        calcSNR(rsl, i);
+        calculateTx(changedAngle, i);
+        calcSNR(i);
       } else {
         continue;
       }
@@ -56,7 +56,7 @@ function masterTxChange() {
         changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        rsl = calculateTx(changedAngle, i);
+        calculateTx(changedAngle, i);
         // var slaveGain = parseFloat(
         //   document.querySelector(`#slave${i}Radio`).value
         // );
@@ -76,7 +76,7 @@ function masterTxChange() {
 
         // // populating the RSL value in the slave field
         // document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
-        calcSNR(rsl, i);
+        calcSNR(i);
       } else {
         continue;
       }
@@ -98,20 +98,20 @@ function bandwidthChange() {
     for (let i = 1; i <= numOfSlaves; i++) {
       // Check if value of slave co-ordinate is not mepty before proceeding
       if (document.querySelector(`#slave${i}Co-ordinate`).value != "") {
-        var hopDist = parseFloat($(`#slave${i}Distance`).html());
+        var hopDist = parseFloat($(`#Distance${i}1`).html());
         // fresnel radius calculation
         var fres = (
           17.32 * Math.sqrt(hopDist / ((4 * frequency) / 1000))
         ).toFixed(2);
         // populating fresnel radius
-        document.getElementById(`slave${i}Fresnel Radius`).innerHTML = fres;
+        document.getElementById(`Fresnel Radius${i}1`).innerHTML = fres;
         var changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
         console.log(masterAngle, changedAngle);
-        rsl = calculateTx(changedAngle, i);
+        calculateTx(changedAngle, i);
 
-        calcSNR(rsl, i);
+        calcSNR(i);
       } else {
         continue;
       }
@@ -123,36 +123,44 @@ function bandwidthChange() {
 function frequencyChanged() {}
 
 // GENERAL FUNCTION
-function calcSNR(rsl, i) {
-  // SNR
-  snr = (parseFloat(rsl) + noisefloor).toFixed(2);
+function calcSNR(i) {
+  for (let j = 0; j <= 1; j++) {
+    var rsl = $(`#RSL${i}${j}`).html();
+    // SNR
+    snr = (parseFloat(rsl) + noisefloor).toFixed(2);
 
-  // fademargin
-  fademargin =
-    parseFloat(rsl) - parseFloat(refertable.rows[1].cells.item(0).innerHTML);
+    // fademargin
+    fademargin =
+      parseFloat(rsl) - parseFloat(refertable.rows[1].cells.item(0).innerHTML);
 
-  // mcs, modulation, etc
-  var rowlength = document.getElementById("throughput20MHz").rows.length;
-  for (let t = 1; t < rowlength; t++) {
-    var min = refertable.rows[t].cells.item(0).innerHTML;
-    var max = refertable.rows[t].cells.item(1).innerHTML;
-    if (parseFloat(rsl) >= min && parseFloat(rsl) <= max) {
-      var mcs = refertable.rows[t].cells.item(2).innerHTML;
-      var modulation = refertable.rows[t].cells.item(3).innerHTML;
-      var fec = refertable.rows[t].cells.item(4).innerHTML;
-      var linkrate = refertable.rows[t].cells.item(5).innerHTML;
-      var throughput = refertable.rows[t].cells.item(6).innerHTML;
-    } else if (parseFloat(rsl) < min) {
-      break;
-    } else {
-      continue;
+    console.log(snr, fademargin);
+
+    // mcs, modulation, etc
+    var rowlength = document.getElementById("throughput20MHz").rows.length;
+    for (let t = 1; t < rowlength; t++) {
+      var min = refertable.rows[t].cells.item(0).innerHTML;
+      var max = refertable.rows[t].cells.item(1).innerHTML;
+      if (parseFloat(rsl) >= min && parseFloat(rsl) <= max) {
+        var mcs = refertable.rows[t].cells.item(2).innerHTML;
+        var modulation = refertable.rows[t].cells.item(3).innerHTML;
+        var fec = refertable.rows[t].cells.item(4).innerHTML;
+        var linkrate = refertable.rows[t].cells.item(5).innerHTML;
+        var throughput = refertable.rows[t].cells.item(6).innerHTML;
+      } else if (parseFloat(rsl) < min) {
+        break;
+      } else {
+        continue;
+      }
     }
+    document.querySelector(`#SNR${i}${j}`).innerHTML = snr;
+    document.getElementById(`Fade Margin${i}${j}`).innerHTML =
+      fademargin.toFixed(2);
+    document.querySelector(`#MCS${i}${j}`).innerHTML = mcs;
+    document.querySelector(`#Modulation${i}${j}`).innerHTML = modulation;
+    document.querySelector(`#FEC${i}${j}`).innerHTML = fec;
+    document.getElementById(`Link Rate${i}${j}`).innerHTML = linkrate;
+    document.querySelector(`#Throughput${i}${j}`).innerHTML = throughput;
   }
-  document.querySelector(`#slave${i}SNR`).innerHTML = snr;
-  document.getElementById(`slave${i}Fade Margin`).innerHTML = fademargin;
-  document.querySelector(`#slave${i}MCS`).innerHTML = mcs;
-  document.querySelector(`#slave${i}Modulation`).innerHTML = modulation;
-  document.querySelector(`#slave${i}FEC`).innerHTML = fec;
-  document.getElementById(`slave${i}Link Rate`).innerHTML = linkrate;
-  document.querySelector(`#slave${i}Throughput`).innerHTML = throughput;
+  // calling function which will calculate the ptmp throughput
+  throughputPTMP();
 }
