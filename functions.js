@@ -54,6 +54,24 @@ function createSlavesCoordinateField() {
   var coordContainer = document.querySelector("#slaveCoordSection");
   coordContainer.innerHTML = "";
   var numOfCoordFields = document.querySelector("#numberOfSlaves").value;
+
+  // clearing the columns of the Master Table created previously
+  var numOfCol = $("#masterTable tr:nth-child(1) th").length;
+  if (numOfCol > 1) {
+    $("#masterTable tr").each(function () {
+      for (let i = 1; i < numOfCol; i++) {
+        console.log("Deleted columns");
+        this.cells[1].remove();
+      }
+    });
+
+    // clearing the Markers when number of slaves changed
+    for (let i = 1; i < numOfCol; i++) {
+      if (typeof marker !== "undefined") {
+        marker[i].setMap(null);
+      }
+    }
+  }
   for (let i = 1; i <= numOfCoordFields; i++) {
     var item = document.createElement("div");
     item.className = "item";
@@ -61,7 +79,7 @@ function createSlavesCoordinateField() {
     coordlabel = document.createElement("label");
     coordlabel.className = "label";
     coordlabel.innerHTML = `Slave${i} Co-ord`;
-    // input field foir the coordinate
+    // input field for the coordinate
     coordinput = document.createElement("input");
     coordinput.setAttribute("type", "text");
     coordinput.setAttribute("id", `slave${i}Co-ordinate`);
@@ -363,7 +381,7 @@ function calculateTx(angle, i) {
 
   // Changing gain based on the angle
   if ((angle >= 330 && angle <= 335) || (angle >= 25 && angle <= 30)) {
-    mRadio = mRadio * 0.2;
+    var mRadio = mRadio * 0.2;
   }
   var eirpVal = [
     slaveTx + mRadio + slaveRadio - 4,
