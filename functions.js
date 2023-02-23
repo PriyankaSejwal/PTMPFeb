@@ -146,8 +146,8 @@ function createSlavesField() {
     var slavedivIn = document.createElement("div");
     slavedivIn.className = "inputSection";
     slavedivIn.setAttribute("id", `slave${i}Inputs`);
-    var inputArray = ["Radio", "Height", "Gain", "Tx Power"];
-    var nameArray = ["Radio", "Height", "Gain", "Tx"];
+    var inputArray = ["Radio", "Gain", "Tx Power", "Height"];
+    var nameArray = ["Radio", "Gain", "Tx", "Height"];
     for (let j = 0; j < inputArray.length; j++) {
       // creating a div with class item
       var slaveitem1 = document.createElement("div");
@@ -197,6 +197,7 @@ function createSlavesField() {
     // Populating the value of antgain and txpower in the fields
     document.getElementById(`slave${i}Gain`).value = 23;
     document.getElementById(`slave${i}Tx`).value = 27;
+    document.getElementById(`slave${i}Height`).value = 0;
 
     // function called to create slave output fields
     createOutputTables(

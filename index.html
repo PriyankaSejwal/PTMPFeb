@@ -130,17 +130,6 @@
                   <option value="19">ion4l2_BTS</option>
                 </select>
               </div>
-              <!-- For Master Angle of Rotation -->
-              <div class="item">
-                <label for="" class="label">Angle</label>
-                <input
-                  type="text"
-                  placeholder="Master Angle"
-                  id="masterAngle"
-                  value="0"
-                  onchange="checkAngle()"
-                />
-              </div>
 
               <div class="item">
                 <label for="" class="label">Gain</label>
@@ -164,9 +153,26 @@
                   onchange="masterTxChange()"
                 />
               </div>
+              <!-- For Master Angle of Rotation -->
+              <div class="item">
+                <label for="" class="label">Angle</label>
+                <input
+                  type="text"
+                  placeholder="Master Angle"
+                  id="masterAngle"
+                  value="0"
+                  onchange="checkAngle()"
+                />
+              </div>
+              <!-- Height -->
               <div class="item">
                 <label for="" class="label">Height</label>
-                <input type="text" placeholder="Height" id="masterHeight" />
+                <input
+                  type="text"
+                  placeholder="Height"
+                  value="0"
+                  id="masterHeight"
+                />
               </div>
             </div>
           </div>

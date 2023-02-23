@@ -28,7 +28,7 @@ body {
 }
 header {
   padding-left: 12px;
-  font-size: 17px;
+  font-size: 15px;
   font-family: "Poppins", sans-serif;
   background-color: #e6e7e8;
   padding-top: 5px;
@@ -161,11 +161,8 @@ input:focus {
   font-weight: 600;
   padding: 5px;
 }
-.table tr:nth-child(1) {
+#masterTable tr:nth-child(1) th {
   text-align: center;
-}
-.table tr th:nth-child(3) {
-  padding-left: 20px;
 }
 .table tr > td {
   color: #54585a;
