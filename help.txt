@@ -1,0 +1,111 @@
+All id and classes:
+
+ID's
+Master Co-ordinate - masterCoord
+Master Angle - masterAngle
+Master Radio - masterRadio
+Master Antenna Gain - masterAntGain
+Master Tx Power - masterTxPower
+Master Height - masterHeight
+
+Number of Slaves - numberOfSlaves
+
+  <!-- Second Section -->
+          <div class="section">
+            <!-- ITEM for number of SLAVES -->
+            <div class="item">
+              <label for="" class="label">Slaves</label>
+              <select
+                name=""
+                id="numberOfSlaves"
+                class="select"
+                onchange="createSlavesField()"
+              >
+                <option value="Number of Slaves" disabled selected>
+                  Number of Slaves
+                </option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+            <!-- ITEM for Bandwidth -->
+            <div class="item">
+              <label for="" class="label">Bandwidth</label>
+              <select
+                name=""
+                id="channelBW"
+                class="select"
+                onchange="checkBandwidth()"
+              >
+                <option value="Channel Bandwidth" disabled selected>
+                  Channel Bandwidth
+                </option>
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="40">40</option>
+                <option value="80">80</option>
+              </select>
+            </div>
+            <!-- ITEM for Channel Frequency -->
+            <div class="item">
+              <label for="" class="label">Frequency</label>
+              <select name="" id="channelFreq" class="select"></select>
+            </div>
+          </div>
+
+
+
+
+           <div class="miscSection">
+          <div class="sectionBorder">
+            <div class="subSection">
+              <!-- ITEM FOR NUMBER OF SLAVES -->
+              <div class="item">
+                <label class="label">Slaves</label>
+                <select
+                  name=""
+                  id="numberOfSlaves"
+                  class="select"
+                  onchange="createSlavesField()"
+                >
+                  <option value="Number of Slaves" disabled selected>
+                    Number of Slaves
+                  </option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <!-- ITEM FOR BANDWIDTH -->
+              <div class="item">
+                <label for="" class="label">Channel Bandwidth</label>
+                <select
+                  name=""
+                  id="channelBW"
+                  class="select"
+                  onchange="checkBandwidth()"
+                >
+                  <option value="Channel Bandwidth" disabled selected>
+                    Channel Bandwidth
+                  </option>
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="40">40</option>
+                  <option value="80">80</option>
+                </select>
+              </div>
+              <!-- ITEM FOR CHANNEL FREQUENCY -->
+              <div class="item">
+                <label for="" class="label">Channel Frequency</label>
+                <select name="" id="channelFreq" class="select"></select>
+              </div>
+            </div>
+          </div>
+        </div>

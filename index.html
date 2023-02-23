@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PTMP</title>
+    <link rel="shortcut icon" href="images/io_logo.svg" type="image/x-icon" />
+    <!-- BOOTSTRAP LINKS -->
+    <!-- <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script> -->
+
+    <!-- Google Fonts Link -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- JQUERY LINK -->
+    <script
+      type="text/javascript"
+      src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"
+    ></script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="mainContainer">
+      <div class="sidebarBody">
+        <!-- Misc Section -->
+        <div class="miscSection">
+          <div class="sectionBorder">
+            <div class="subSection">
+              <!-- ITEM FOR NUMBER OF SLAVES -->
+              <div class="item">
+                <label class="label">Slaves</label>
+                <select
+                  name=""
+                  id="numberOfSlaves"
+                  class="select"
+                  onchange="createSlavesCoordinateField();createSlavesField(); createMasterTable()"
+                >
+                  <option value="" disabled selected>Number of Slaves</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <!-- ITEM FOR BANDWIDTH -->
+              <div class="item">
+                <label for="" class="label">Channel Bandwidth</label>
+                <select
+                  name=""
+                  id="channelBW"
+                  class="select"
+                  onchange="checkBandwidth(); bandwidthChange()"
+                >
+                  <option value="Channel Bandwidth" disabled selected>
+                    Channel Bandwidth
+                  </option>
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="40">40</option>
+                  <option value="80">80</option>
+                </select>
+              </div>
+              <!-- ITEM FOR CHANNEL FREQUENCY -->
+              <div class="item">
+                <label for="" class="label">Channel Frequency</label>
+                <select
+                  name=""
+                  id="channelFreq"
+                  class="select"
+                  onchange="bandwidthChange()"
+                ></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Master Section -->
+        <div class="coordSection">
+          <div class="sectionBorder">
+            <!-- First sub section for master coord, master angle and master radio -->
+            <div class="subSection">
+              <div class="item">
+                <label for="" class="label">Master</label>
+                <input
+                  type="text"
+                  placeholder="Master Co-ord"
+                  name="Master"
+                  id="masterCoord"
+                  onchange="placeMasterOnMap()"
+                />
+              </div>
+            </div>
+            <!-- section for slaves coordinates -->
+            <div class="subSection" id="slaveCoordSection"></div>
+          </div>
+        </div>
+
+        <!-- Slaves Co-ordinate Section -->
+
+        <!-- Master Parameters Section -->
+        <div class="masterSection">
+          <div class="sectionBorder">
+            <div class="subSection">
+              <!-- item for radio selection of master bts -->
+              <div class="item">
+                <label for="" class="label">Master Radio</label>
+                <select
+                  name=""
+                  id="masterRadio"
+                  class="select"
+                  onchange="masterRadioChanged()"
+                >
+                  <option value="17">ion4l1_BTS</option>
+                  <option value="19">ion4l2_BTS</option>
+                </select>
+              </div>
+
+              <div class="item">
+                <label for="" class="label">Gain</label>
+                <input
+                  type="text"
+                  id="masterAntGain"
+                  placeholder="Antenna Gain"
+                  value="17"
+                  disabled
+                />
+              </div>
+              <div class="item">
+                <label for="" class="label">Tx Power</label>
+                <input
+                  type="number"
+                  id="masterTxPower"
+                  min="3"
+                  max="27"
+                  value="27"
+                  placeholder="Transmit Power"
+                  onchange="masterTxChange()"
+                />
+              </div>
+              <!-- For Master Angle of Rotation -->
+              <div class="item">
+                <label for="" class="label">Angle</label>
+                <input
+                  type="text"
+                  placeholder="Master Angle"
+                  id="masterAngle"
+                  value="0"
+                  onchange="checkAngle()"
+                />
+              </div>
+              <!-- Height -->
+              <div class="item">
+                <label for="" class="label">Height</label>
+                <input
+                  type="text"
+                  placeholder="Height"
+                  value="0"
+                  id="masterHeight"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="sectionBorder">
+            <div class="masterTableDiv">
+              <table
+                id="masterTable"
+                class="table table-condensed table-striped"
+              >
+                <tbody>
+                  <tr>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <th>Azimuth</th>
+                  </tr>
+                  <tr>
+                    <th>RSL</th>
+                  </tr>
+                  <tr>
+                    <th>Snr</th>
+                  </tr>
+                  <tr>
+                    <th>Fade Margin</th>
+                  </tr>
+                  <tr>
+                    <th>Mcs</th>
+                  </tr>
+                  <tr>
+                    <th>Modulation</th>
+                  </tr>
+                  <tr>
+                    <th>FEC</th>
+                  </tr>
+                  <tr>
+                    <th>Link Rate</th>
+                  </tr>
+                  <tr>
+                    <th>Throughput</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second section with a border -->
+
+        <div id="slavesInput"></div>
+        <div class="btnGroup">
+          <button type="button" id="reportButton" disabled>
+            Installation Report
+          </button>
+        </div>
+      </div>
+      <div class="mapBody">
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <div class="table" style="display: none">
+      <!-- Table 1 10 MHz -->
+      <table id="throughput10MHz" class="mcsTable" hidden>
+        <tr>
+          <th>Min</th>
+          <th>Max</th>
+          <th>MCS</th>
+          <th>Modulation</th>
+          <th>FEC</th>
+          <th>Link Rate</th>
+          <th>Throughput</th>
+        </tr>
+        <tr>
+          <td>-150</td>
+          <td>-85.01</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+        <tr>
+          <td>-85</td>
+          <td>-82.01</td>
+          <td>0</td>
+          <td>BPSK</td>
+          <td>1/2</td>
+          <td>7</td>
+          <td>4.9</td>
+        </tr>
+        <tr>
+          <td>-82</td>
+          <td>-80.01</td>
+          <td>1</td>
+          <td>QPSK</td>
+          <td>1/2</td>
+          <td>14</td>
+          <td>9.8</td>
+        </tr>
+        <tr>
+          <td>-80</td>
+          <td>-77.01</td>
+          <td>2</td>
+          <td>QPSK</td>
+          <td>3/4</td>
+          <td>21</td>
+          <td>14.7</td>
+        </tr>
+        <tr>
+          <td>-77</td>
+          <td>-73.01</td>
+          <td>3</td>
+          <td>16-QAM</td>
+          <td>1/2</td>
+          <td>28</td>
+          <td>19.6</td>
+        </tr>
+        <tr>
+          <td>-73</td>
+          <td>-69.01</td>
+          <td>4</td>
+          <td>16-QAM</td>
+          <td>3/4</td>
+          <td>43</td>
+          <td>30.01</td>
+        </tr>
+        <tr>
+          <td>-69</td>
+          <td>-68.01</td>
+          <td>5</td>
+          <td>64-QAM</td>
+          <td>2/3</td>
+          <td>57</td>
+          <td>39.9</td>
+        </tr>
+        <tr>
+          <td>-68</td>
+          <td>-65.01</td>
+          <td>6</td>
+          <td>64-QAM</td>
+          <td>3/4</td>
+          <td>65</td>
+          <td>45.5</td>
+        </tr>
+        <tr>
+          <td>-65</td>
+          <td>-62.01</td>
+          <td>7</td>
+          <td>64-QAM</td>
+          <td>5/6</td>
+          <td>72</td>
+          <td>50.4</td>
+        </tr>
+        <tr>
+          <td>-62</td>
+          <td>-60.01</td>
+          <td>8</td>
+          <td>256-QAM</td>
+          <td>3/4</td>
+          <td>86</td>
+          <td>60.2</td>
+        </tr>
+        <tr>
+          <td>-60</td>
+          <td>0</td>
+          <td>9</td>
+          <td>256-QAM</td>
+          <td>5/6</td>
+          <td>96</td>
+          <td>67.2</td>
+        </tr>
+        <tr>
+          <td>0.1</td>
+          <td>100</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+      </table>
+
+      <!-- TABLE 2 BANDWIDTH 20MHz -->
+      <table id="throughput20MHz" class="mcsTable" hidden>
+        <tr>
+          <th>Min</th>
+          <th>Max</th>
+          <th>MCS</th>
+          <th>Modulation</th>
+          <th>FEC</th>
+          <th>Link Rate</th>
+          <th>Throughput</th>
+        </tr>
+        <tr>
+          <td>-100</td>
+          <td>-82.01</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+        <tr>
+          <td>-82</td>
+          <td>-79.01</td>
+          <td>0</td>
+          <td>BPSK</td>
+          <td>1/2</td>
+          <td>14.4</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>-79</td>
+          <td>-77.01</td>
+          <td>1</td>
+          <td>QPSK</td>
+          <td>1/2</td>
+          <td>28.9</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <td>-77</td>
+          <td>-74.01</td>
+          <td>2</td>
+          <td>QPSK</td>
+          <td>3/4</td>
+          <td>43.3</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <td>-74</td>
+          <td>-70.01</td>
+          <td>3</td>
+          <td>16-QAM</td>
+          <td>1/2</td>
+          <td>57.8</td>
+          <td>40</td>
+        </tr>
+        <tr>
+          <td>-70</td>
+          <td>-66.01</td>
+          <td>4</td>
+          <td>16-QAM</td>
+          <td>3/4</td>
+          <td>86.7</td>
+          <td>60</td>
+        </tr>
+        <tr>
+          <td>-66</td>
+          <td>-65.01</td>
+          <td>5</td>
+          <td>64-QAM</td>
+          <td>2/3</td>
+          <td>115.6</td>
+          <td>80</td>
+        </tr>
+        <tr>
+          <td>-65</td>
+          <td>-64.01</td>
+          <td>6</td>
+          <td>64-QAM</td>
+          <td>3/4</td>
+          <td>130</td>
+          <td>91</td>
+        </tr>
+        <tr>
+          <td>-64</td>
+          <td>-59.01</td>
+          <td>7</td>
+          <td>64-QAM</td>
+          <td>5/6</td>
+          <td>144.4</td>
+          <td>101</td>
+        </tr>
+        <tr>
+          <td>-59</td>
+          <td>-57.01</td>
+          <td>8</td>
+          <td>256-QAM</td>
+          <td>3/4</td>
+          <td>173.3</td>
+          <td>120</td>
+        </tr>
+        <tr>
+          <td>-57</td>
+          <td>0</td>
+          <td>9</td>
+          <td>256-QAM</td>
+          <td>5/6</td>
+          <td>192</td>
+          <td>135</td>
+        </tr>
+        <tr>
+          <td>0.1</td>
+          <td>100</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+      </table>
+
+      <!-- TABLE 2 BANDWIDTH 40MHz  -->
+
+      <table id="throughput40MHz" class="mcsTable" hidden>
+        <tr>
+          <th>Min</th>
+          <th>Max</th>
+          <th>MCS</th>
+          <th>Modulation</th>
+          <th>FEC</th>
+          <th>Link Rate</th>
+          <th>Throughput</th>
+        </tr>
+        <tr>
+          <td>-100</td>
+          <td>-79.01</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+        <tr>
+          <td>-79</td>
+          <td>-76.01</td>
+          <td>0</td>
+          <td>BPSK</td>
+          <td>1/2</td>
+          <td>30</td>
+          <td>21</td>
+        </tr>
+        <tr>
+          <td>-76</td>
+          <td>-74.01</td>
+          <td>1</td>
+          <td>QPSK</td>
+          <td>1/2</td>
+          <td>60</td>
+          <td>42</td>
+        </tr>
+        <tr>
+          <td>-74</td>
+          <td>-71.01</td>
+          <td>2</td>
+          <td>QPSK</td>
+          <td>3/4</td>
+          <td>90</td>
+          <td>63</td>
+        </tr>
+        <tr>
+          <td>-71</td>
+          <td>-67.01</td>
+          <td>3</td>
+          <td>16-QAM</td>
+          <td>1/2</td>
+          <td>120</td>
+          <td>84</td>
+        </tr>
+        <tr>
+          <td>-67</td>
+          <td>-63.01</td>
+          <td>4</td>
+          <td>16-QAM</td>
+          <td>3/4</td>
+          <td>180</td>
+          <td>126</td>
+        </tr>
+        <tr>
+          <td>-63</td>
+          <td>-62.01</td>
+          <td>5</td>
+          <td>64-QAM</td>
+          <td>2/3</td>
+          <td>240</td>
+          <td>168</td>
+        </tr>
+        <tr>
+          <td>-62</td>
+          <td>-61.01</td>
+          <td>6</td>
+          <td>64-QAM</td>
+          <td>3/4</td>
+          <td>270</td>
+          <td>189</td>
+        </tr>
+        <tr>
+          <td>-61</td>
+          <td>-56.01</td>
+          <td>7</td>
+          <td>64-QAM</td>
+          <td>5/6</td>
+          <td>300</td>
+          <td>210</td>
+        </tr>
+        <tr>
+          <td>-56</td>
+          <td>-54.01</td>
+          <td>8</td>
+          <td>256-QAM</td>
+          <td>3/4</td>
+          <td>360</td>
+          <td>252</td>
+        </tr>
+        <tr>
+          <td>-54</td>
+          <td>0</td>
+          <td>9</td>
+          <td>256-QAM</td>
+          <td>5/6</td>
+          <td>400</td>
+          <td>280</td>
+        </tr>
+        <tr>
+          <td>0.1</td>
+          <td>100</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+      </table>
+
+      <table id="throughput80MHz" class="mcsTable" hidden>
+        <tr>
+          <th>Min</th>
+          <th>Max</th>
+          <th>MCS</th>
+          <th>Modulation</th>
+          <th>FEC</th>
+          <th>Link Rate</th>
+          <th>Throughput</th>
+        </tr>
+        <tr>
+          <td>-100</td>
+          <td>-76.01</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+        <tr>
+          <td>-76</td>
+          <td>-73.01</td>
+          <td>0</td>
+          <td>BPSK</td>
+          <td>1/2</td>
+          <td>65</td>
+          <td>45</td>
+        </tr>
+        <tr>
+          <td>-73</td>
+          <td>-71.01</td>
+          <td>1</td>
+          <td>QPSK</td>
+          <td>1/2</td>
+          <td>130</td>
+          <td>91</td>
+        </tr>
+        <tr>
+          <td>-71</td>
+          <td>-68.01</td>
+          <td>2</td>
+          <td>QPSK</td>
+          <td>3/4</td>
+          <td>195</td>
+          <td>135</td>
+        </tr>
+        <tr>
+          <td>-68</td>
+          <td>-64.01</td>
+          <td>3</td>
+          <td>16-QAM</td>
+          <td>1/2</td>
+          <td>260</td>
+          <td>182</td>
+        </tr>
+        <tr>
+          <td>-64</td>
+          <td>-60.01</td>
+          <td>4</td>
+          <td>16-QAM</td>
+          <td>3/4</td>
+          <td>390</td>
+          <td>275</td>
+        </tr>
+        <tr>
+          <td>-60</td>
+          <td>-59.01</td>
+          <td>5</td>
+          <td>64-QAM</td>
+          <td>2/3</td>
+          <td>520</td>
+          <td>365</td>
+        </tr>
+        <tr>
+          <td>-59</td>
+          <td>-58.01</td>
+          <td>6</td>
+          <td>64-QAM</td>
+          <td>3/4</td>
+          <td>585</td>
+          <td>410</td>
+        </tr>
+        <tr>
+          <td>-58</td>
+          <td>-53.01</td>
+          <td>7</td>
+          <td>64-QAM</td>
+          <td>5/6</td>
+          <td>650</td>
+          <td>455</td>
+        </tr>
+        <tr>
+          <td>-53</td>
+          <td>-51.01</td>
+          <td>8</td>
+          <td>256-QAM</td>
+          <td>3/4</td>
+          <td>780</td>
+          <td>546</td>
+        </tr>
+        <tr>
+          <td>-51</td>
+          <td>0</td>
+          <td>9</td>
+          <td>256-QAM</td>
+          <td>5/6</td>
+          <td>866.7</td>
+          <td>610</td>
+        </tr>
+        <tr>
+          <td>0.1</td>
+          <td>100</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+      </table>
+
+      <table id="throughput160MHz" class="mcsTable" hidden>
+        <tr>
+          <th>Min</th>
+          <th>Max</th>
+          <th>MCS</th>
+          <th>Modulation</th>
+          <th>FEC</th>
+          <th>Link Rate</th>
+          <th>Throughput</th>
+        </tr>
+
+        <tr>
+          <td>6</td>
+          <td>9.9999</td>
+          <td>0</td>
+          <td>BPSK</td>
+          <td>1/2</td>
+          <td>130</td>
+          <td>45</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>11.9999</td>
+          <td>1</td>
+          <td>QPSK</td>
+          <td>1/2</td>
+          <td>260</td>
+          <td>91</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>14.9999</td>
+          <td>2</td>
+          <td>QPSK</td>
+          <td>3/4</td>
+          <td>390</td>
+          <td>135</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>16.9999</td>
+          <td>3</td>
+          <td>16-QAM</td>
+          <td>1/2</td>
+          <td>520</td>
+          <td>182</td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td>19.9999</td>
+          <td>4</td>
+          <td>16-QAM</td>
+          <td>3/4</td>
+          <td>780</td>
+          <td>275</td>
+        </tr>
+        <tr>
+          <td>20</td>
+          <td>22.9999</td>
+          <td>5</td>
+          <td>64-QAM</td>
+          <td>2/3</td>
+          <td>1040</td>
+          <td>365</td>
+        </tr>
+        <tr>
+          <td>23</td>
+          <td>25.9999</td>
+          <td>6</td>
+          <td>64-QAM</td>
+          <td>3/4</td>
+          <td>1170</td>
+          <td>410</td>
+        </tr>
+        <tr>
+          <td>26</td>
+          <td>29.9999</td>
+          <td>7</td>
+          <td>64-QAM</td>
+          <td>5/6</td>
+          <td>1300</td>
+          <td>455</td>
+        </tr>
+        <tr>
+          <td>30</td>
+          <td>30.9999</td>
+          <td>8</td>
+          <td>256-QAM</td>
+          <td>3/4</td>
+          <td>1560</td>
+          <td>546</td>
+        </tr>
+        <tr>
+          <td>31</td>
+          <td>80</td>
+          <td>9</td>
+          <td>256-QAM</td>
+          <td>5/6</td>
+          <td>1733.3</td>
+          <td>610</td>
+        </tr>
+      </table>
+    </div>
+    <script src="mastermap.js"></script>
+    <script src="functions.js"></script>
+    <script src="onchange.js"></script>
+    <script src="masterparams.js"></script>
+    <script src="createMTable.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&callback=initMap"></script>
+    <!-- <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+      defer
+    ></script> -->
+  </body>
+</html>
