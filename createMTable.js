@@ -19,9 +19,10 @@ function createMasterTable() {
   }
   for (let i = 0; i < ArrMaster.length; i++) {
     for (let j = 0; j < numOfSlaves; j++) {
-      $("<td>", { id: ArrMaster[i] + `${j + 1}0` }).appendTo(
-        $(`#masterTable tbody tr:nth-child(${i + 2})`)
-      );
+      $("<td>", {
+        id: ArrMaster[i] + `${j + 1}0`,
+        class: `reset${j + 1}0`,
+      }).appendTo($(`#masterTable tbody tr:nth-child(${i + 2})`));
     }
   }
 }
