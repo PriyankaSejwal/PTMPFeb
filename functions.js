@@ -1,5 +1,6 @@
 // Global Variables
 var masterAzimuthArray = [];
+var polyLine = [];
 var refertable, noisefloor;
 window.onload = checkBandwidth();
 
@@ -67,8 +68,9 @@ function createSlavesCoordinateField() {
 
     // clearing the Markers when number of slaves changed
     for (let i = 1; i < numOfCol; i++) {
-      if (typeof marker !== "undefined") {
+      if (marker != "") {
         marker[i].setMap(null);
+        polyLine[i].setMap(null);
       }
     }
   }
@@ -83,7 +85,7 @@ function createSlavesCoordinateField() {
     coordinput = document.createElement("input");
     coordinput.setAttribute("type", "text");
     coordinput.setAttribute("id", `slave${i}Co-ordinate`);
-    coordinput.setAttribute("placeholder", "Co - ordinate");
+    coordinput.setAttribute("placeholder", "lat/long");
     coordinput.setAttribute("name", `slave${i}`);
 
     item.append(coordlabel, coordinput);
@@ -101,8 +103,8 @@ function createSlavesCoordinateField() {
         //   masterAzimuthArray[i - 1] = null;
         // }
         if (marker[i] != null) {
-          console.log("marker is there");
           marker[i].setMap(null);
+          polyLine[i].setMap(null);
         }
         var coordslave = this.value.split(",");
         var [lat, long] = coordslave;
@@ -115,6 +117,13 @@ function createSlavesCoordinateField() {
         });
         bounds.extend({ lat: parseFloat(lat), lng: parseFloat(long) });
         map.fitBounds(bounds);
+
+        // PolyLine
+        polyLine[i] = new google.maps.Polyline({
+          map: map,
+          path: [masterMarker.getPosition(), marker[i].getPosition()],
+          strokOpacity: 0.8,
+        });
 
         // calling the function which calculates the parameters
         azimuth(parseFloat(lat), parseFloat(long), i);
@@ -131,73 +140,87 @@ function createSlavesField() {
   // Creating slaves section for each slave
   for (let i = 1; i <= number_of_slaves; i++) {
     // Main div for each slave section having border details
-    var slaveSectionBorder = document.createElement("div");
-    slaveSectionBorder.className = "sectionBorder";
-
+    var slaveSectionBorder = $("<div>", { class: "sectionBorder" }).appendTo(
+      slavecontainer
+    );
     // Div which carries the header and item div
-    var slaveInputSection = document.createElement("div");
-    slaveInputSection.className = `slave${i}InputSection`;
+    var slaveInputSection = $("<div>", { class: `slave${i}InputSection` });
+    slaveInputSection.appendTo(slaveSectionBorder);
 
     // Input Header
-    var inputHeader = document.createElement("header");
-    inputHeader.innerHTML = `Slave ${i}`;
-
+    var inputHeader = $("<header>", { html: `Slave ${i}` });
     // div for each slave row INPUT
-    var slavedivIn = document.createElement("div");
-    slavedivIn.className = "inputSection";
-    slavedivIn.setAttribute("id", `slave${i}Inputs`);
+    var slavedivIn = $("<div>", { class: "inputSection" });
+    // Appending header and slaveDivIn to
+    slaveInputSection.append(inputHeader, slavedivIn);
     var inputArray = ["Radio", "Gain", "Tx Power", "Height"];
     var nameArray = ["Radio", "Gain", "Tx", "Height"];
     for (let j = 0; j < inputArray.length; j++) {
       // creating a div with class item
-      var slaveitem1 = document.createElement("div");
-      slaveitem1.className = "item";
+      var slaveitem1 = $("<div>", { class: "item" }).appendTo(slavedivIn);
       // created a label for the slave name
-      var slavelabel = document.createElement("LABEL");
-      var text = document.createTextNode(inputArray[j]);
-      slavelabel.appendChild(text);
-      slavelabel.className = "label";
+      var slavelabel = $("<label>", {
+        text: inputArray[j],
+        class: "label",
+      });
       // created input field to enter the co-ordinates of the slaves
       switch (inputArray[j]) {
         case "Radio":
-          var slaveinput = document.createElement("select");
-          slaveinput.className = "select";
-          slaveinput.setAttribute("id", `slave${i}Radio`);
+          var slaveinput = $("<select>", {
+            class: "select",
+            id: `slave${i}Radio`,
+          });
+          // OPT GROUP 1
+          var optGroup1 = $("<optgroup>", {
+            label: "Integrated Dish Antenna",
+          }).appendTo(slaveinput);
+          // OPT GROUP 2
+          var optGroup2 = $("<optgroup>", {
+            label: "Integrated Flat Panel Antenna",
+          }).appendTo(slaveinput);
+          // OPT GROUP 3
+          var optGroup3 = $("<optgroup>", {
+            label: "External Antenna",
+          }).appendTo(slaveinput);
+
           radioList = {
             ion4l2: "23",
+            ion4l2_CPE: "23",
             ion4l3: "25",
+            ion4l3_CPE: "25",
             ion4l4: "27",
             ion4le: "0",
+            ion4le_CPE: "0",
           };
           for (let [key, val] of Object.entries(radioList)) {
-            var radioOption = document.createElement("option");
-            radioOption.value = val;
-            radioOption.innerHTML = key;
-            slaveinput.add(radioOption);
+            var radioOption = $("<option>", { value: val, html: key });
+            if (key.includes("l2_CPE")) {
+              optGroup2.append(radioOption);
+            } else if (key.includes("e")) {
+              optGroup3.append(radioOption);
+            } else {
+              optGroup1.append(radioOption);
+            }
           }
-
           break;
         default:
-          var slaveinput = document.createElement("input");
-          slaveinput.setAttribute("type", "text");
-          slaveinput.setAttribute("id", `slave${i}` + nameArray[j]);
-          slaveinput.setAttribute("placeholder", inputArray[j]);
+          var slaveinput = $("<input>", {
+            type: "text",
+            id: `slave${i}` + nameArray[j],
+            placeholder: inputArray[j],
+          });
       }
-
       slaveitem1.append(slavelabel, slaveinput);
-      slavedivIn.append(slaveitem1);
     } // end of j loop for inputs
-    slaveInputSection.append(inputHeader, slavedivIn);
-    slaveSectionBorder.append(slaveInputSection);
-    slavecontainer.append(slaveSectionBorder);
 
     // function to create output fields
     // createOutputs(i, outputContainer);
 
     // Populating the value of antgain and txpower in the fields
-    document.getElementById(`slave${i}Gain`).value = 23;
-    document.getElementById(`slave${i}Tx`).value = 27;
-    document.getElementById(`slave${i}Height`).value = 0;
+    $(`#slave${i}Gain`).val(23);
+    $(`#slave${i}Gain`).prop("disabled", true);
+    $(`#slave${i}Tx`).val(27);
+    $(`#slave${i}Height`).val(0);
 
     // function called to create slave output fields
     createOutputTables(
@@ -208,59 +231,59 @@ function createSlavesField() {
     );
 
     // event listener on Radio Fields of Slave and the Transmit Power Fields
-    document
-      .querySelector(`#slave${i}Radio`)
-      .addEventListener("change", function () {
-        var slaveRadio = parseInt(this.value);
-        document.getElementById(`slave${i}Gain`).value = slaveRadio;
+    $(`#slave${i}Radio`).change(function () {
+      var selection = $(`#slave${i}Radio option:selected`);
+      var radioGain = parseFloat(selection.val());
+      document.getElementById(`slave${i}Gain`).value = radioGain;
+      var radioType = selection.html();
+      if (radioType.includes("le")) {
+        $(`#slave${i}Gain`).prop("disabled", false);
+        // CAN ALSO HAVE A POP MESSAGE ASKING USER TO INPUT GAIN.
+        $(`#slave${i}Gain`).focus();
+        // for (let j = 0; j <= 1; j++) {
+        //   $(`.reset${i}${j}`).html(" ");
+        // }
+      } else {
+        $(`#slave${i}Gain`).prop("disabled", true);
         if (document.getElementById(`slave${i}Co-ordinate`).value != "") {
           var masterAngle = parseFloat($("#masterAngle").val());
           var changedAngle = parseFloat(
             (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
           );
           rsl = calculateTx(changedAngle, i);
-          calcSNR(rsl, i);
-
-          // parameters required to calculate the RSL
-          // var masterTx = parseFloat(
-          //   document.querySelector("#masterTxPower").value
-          // );
-          // var masterGain = parseInt(
-          //   document.querySelector("#masterRadio").value
-          // );
-          // var frequency = parseInt(
-          //   document.querySelector("#channelFreq").values
-          // );
-          // var slaveTx = parseFloat(
-          //   document.getElementById(`slave${i}Tx Power`).value
-          // );
-          // var hopDist = parseFloat(
-          //   document.querySelector(`#slave${i}Distance`).innerHTML
-          // );
-          // calculating RSL
-          // rsl = (
-          //   masterGain +
-          //   masterTx +
-          //   slaveRadio -
-          //   4 -
-          //   (20 * Math.log10(hopDist) +
-          //     20 * Math.log10(frequency / 1000) +
-          //     92.45)
-          // ).toFixed(2);
-          // populating the RSL value in the slave field
-          // document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
-          // calcSNR(rsl, i);
+          calcSNR(i);
         }
-      });
+      }
+    });
 
-    // Second event listener to change the parameters when tx power will change
+    // Second Event Listener which gets fired when the gain value is changed for external antennas
+    $(`#slave${i}Gain`).change(function () {
+      if ($(`#slave${i}Gain`).val() > 35) {
+        window.alert("Gain must be less than 35. ");
+      } else {
+        if ($(`#slave${i}Co-ordinate`).val() != "") {
+          var masterAngle = parseFloat($("#masterAngle").val());
+          var changedAngle = parseFloat(
+            (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
+          );
+          calculateTx(changedAngle, i);
+          calcSNR(i);
+        }
+      }
+    });
+
+    // Third event listener to change the parameters when tx power will change
     // This will not impact the calculations for the slave as slave tx power is used to calculate the rsl of Master
-    document
-      .getElementById(`slave${i}Tx`)
-      .addEventListener("change", function () {
-        var slaveTx = document.getElementById(`slave${i}Tx`).value;
-        console.log(slaveTx);
-      });
+    $(`#slave${i}Tx`).change(function () {
+      if (document.getElementById(`slave${i}Co-ordinate`).value != "") {
+        var masterAngle = parseFloat($("#masterAngle").val());
+        var changedAngle = parseFloat(
+          (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
+        );
+        calculateTx(changedAngle, i);
+        calcSNR(i);
+      }
+    });
   }
 }
 
@@ -293,12 +316,13 @@ function createOutputTables(
       );
       $("<td>", {
         id: tableArr[k][j] + `${i}1`,
+        class: `reset${i}1`,
         html: "hello",
       }).appendTo($(`#slave${i}Table tr:nth-child(${k + 1})`));
     }
   }
-  slaveSectionBorder.append(slaveInputSection);
-  slavecontainer.append(slaveSectionBorder);
+  // slaveSectionBorder.append(slaveInputSection);
+  // slavecontainer.append(slaveSectionBorder);
 }
 
 // function to create output fields
@@ -315,9 +339,6 @@ function rad2deg(rad) {
 function azimuth(slavelat, slavelong, i) {
   // parameters required
   var masterAngle = parseFloat($("#masterAngle").val());
-  // var masterRadio = parseFloat($("#masterRadio").val());
-  var slaveRadio = parseFloat($(`#slave${i}Radio`).val());
-  var masterTx = parseFloat($("#masterTxPower").val());
   var master = document.querySelector("#masterCoord").value.split(",");
   var [masterlat, masterlong] = master;
   var cf = $("#channelFreq").val();
@@ -374,20 +395,31 @@ function azimuth(slavelat, slavelong, i) {
 function calculateTx(angle, i) {
   var mRadio = parseFloat($("#masterRadio").val());
   var masterTx = parseFloat($("#masterTxPower").val());
-  var slaveRadio = parseFloat($(`#slave${i}Radio`).val());
+  var slaveGain = parseFloat($(`#slave${i}Gain`).val());
   var slaveTx = parseFloat($(`#slave${i}Tx`).val());
   var hopDist = parseFloat($(`#Distance${i}1`).html());
   var cf = $("#channelFreq").val();
-  console.log(mRadio, masterTx, slaveRadio, hopDist, cf);
+  var masterBeamwidth = parseInt($("#masterRadio").val().split(",")[1]);
+  console.log(mRadio, masterTx, slaveGain, hopDist, cf);
+  // upper lower limits of the angle on right and left side
+  var halfBeam = masterBeamwidth / 2;
+  var rightUpperLimit = halfBeam;
+  var rightLowerLimit = halfBeam - 5;
+  var leftLowerLimit = 360 - halfBeam;
+  var leftUpperLimit = leftLowerLimit + 5;
+  console.log(rightLowerLimit, rightUpperLimit, leftLowerLimit, leftUpperLimit);
 
   // Changing gain based on the angle
-  if ((angle >= 330 && angle <= 335) || (angle >= 25 && angle <= 30)) {
+  if (
+    (angle >= leftLowerLimit && angle <= leftUpperLimit) ||
+    (angle >= rightLowerLimit && angle <= rightUpperLimit)
+  ) {
     var mRadio = mRadio * 0.2;
   }
   var eirpVal = [
-    slaveTx + mRadio + slaveRadio - 4,
+    slaveTx + mRadio + slaveGain - 4,
     // change this mRadio to original mRadio value if master doesnot gets affected even when slave is at the ends of the main lobe
-    masterTx + mRadio + slaveRadio - 4,
+    masterTx + mRadio + slaveGain - 4,
   ];
   console.log(eirpVal);
   for (let j = 0; j <= 1; j++) {
@@ -404,123 +436,6 @@ function calculateTx(angle, i) {
   }
 }
 
-// function azimuthangle(slavelat, slavelong, i) {
-//   // inputs needed
-//   var master = document.querySelector("#masterCoord").value.split(",");
-//   var [masterlat, masterlong] = master;
-//   var masterRadio = parseFloat(document.querySelector("#masterRadio").value);
-//   var slaveRadio = parseFloat(document.querySelector(`#slave${i}Radio`).value);
-//   var masterTx = parseFloat(document.querySelector("#masterTxPower").value);
-//   var bw = document.querySelector("#channelBW").value;
-//   // var noise = noisecalc(bw);
-//   var cf = document.querySelector("#channelFreq").value;
-//   // Degree to radian
-//   var masterLat = deg2rad(parseFloat(masterlat));
-//   var masterLong = deg2rad(parseFloat(masterlong));
-//   var slaveLat = deg2rad(slavelat);
-//   var slaveLong = deg2rad(slavelong);
-//   var diffLat = deg2rad(slavelat - parseFloat(masterlat));
-//   var diffLong = deg2rad(slavelong - parseFloat(masterlong));
-//   var R = 6371; //Radius of the earth in km
-
-//   // Hop Distance Calculation
-//   var a =
-//     Math.sin(diffLat / 2) * Math.sin(diffLat / 2) +
-//     Math.sin(diffLong / 2) *
-//       Math.sin(diffLong / 2) *
-//       Math.cos(masterLat) *
-//       Math.cos(slaveLat);
-//   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//   var distance = Math.round(R * c * 100) / 100; // Distance in km
-
-//   // Azimuth Calculation
-//   var y = Math.sin(slaveLong - masterLong) * Math.cos(slaveLat);
-//   var x =
-//     Math.cos(masterLat) * Math.sin(slaveLat) -
-//     Math.sin(masterLat) * Math.cos(slaveLat) * Math.cos(slaveLong - masterLong);
-//   var bearing = Math.atan2(y, x);
-//   bearing = rad2deg(bearing);
-//   var anglea = ((bearing + 360) % 360).toFixed(2);
-//   var angleb = ((anglea - 180 + 360) % 360).toFixed(2);
-
-//   // fresnel radius calculation
-//   var fres = (17.32 * Math.sqrt(distance / ((4 * cf) / 1000))).toFixed(2);
-
-//   // RSL
-//   rsl = (
-//     masterTx +
-//     masterRadio +
-//     slaveRadio -
-//     4 -
-//     (20 * Math.log10(distance) + 20 * Math.log10(cf / 1000) + 92.45)
-//   ).toFixed(2);
-
-//   // SNR
-//   snr = parseFloat(rsl) + noisefloor;
-
-//   // fademargin
-//   fademargin =
-//     parseFloat(rsl) - parseFloat(refertable.rows[1].cells.item(0).innerHTML);
-
-//   // mcs, modulation, etc
-//   var rowlength = document.getElementById("throughput20MHz").rows.length;
-//   for (let t = 1; t < rowlength; t++) {
-//     var min = refertable.rows[t].cells.item(0).innerHTML;
-//     var max = refertable.rows[t].cells.item(1).innerHTML;
-//     if (parseFloat(rsl) >= min && parseFloat(rsl) <= max) {
-//       var mcs = refertable.rows[t].cells.item(2).innerHTML;
-//       var modulation = refertable.rows[t].cells.item(3).innerHTML;
-//       var fec = refertable.rows[t].cells.item(4).innerHTML;
-//       var linkrate = refertable.rows[t].cells.item(5).innerHTML;
-//       var throughput = refertable.rows[t].cells.item(6).innerHTML;
-//     } else if (parseFloat(rsl) < min) {
-//       break;
-//     } else {
-//       continue;
-//     }
-//   }
-//   document.querySelector(`#slave${i}Azimuth`).innerHTML = angleb;
-//   document.querySelector(`#slave${i}Distance`).innerHTML = distance;
-//   document.getElementById(`slave${i}Fresnel Radius`).innerHTML = fres;
-//   document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
-//   document.querySelector(`#slave${i}SNR`).innerHTML = snr;
-//   document.getElementById(`slave${i}Fade Margin`).innerHTML = fademargin;
-//   document.querySelector(`#slave${i}MCS`).innerHTML = mcs;
-//   document.querySelector(`#slave${i}Modulation`).innerHTML = modulation;
-//   document.querySelector(`#slave${i}FEC`).innerHTML = fec;
-//   document.getElementById(`slave${i}Link Rate`).innerHTML = linkrate;
-//   document.querySelector(`#slave${i}Throughput`).innerHTML = throughput;
-//   document.getElementById(`slave${i}In Range`).innerHTML = " ";
-//   // document.getElementById(`slave${i}V Range`).innerHTML = " ";
-
-//   return anglea;
-// }
-
-// function to calculate the noise figure basis of the bandwidth
-// function noisecalc(bw) {
-//   var value;
-//   switch (bw) {
-//     case "10":
-//       value = 89;
-//       refertable = document.querySelector("#throughput10MHz");
-//       break;
-//     case "20":
-//       value = 89;
-//       refertable = document.querySelector("#throughput20MHz");
-//       break;
-//     case "40":
-//       value = 86;
-//       refertable = document.querySelector("#throughput40MHz");
-//       break;
-//     case "80":
-//       value = 83;
-//       refertable = document.querySelector("#throughput80MHz");
-//       break;
-//   }
-//   console.log(refertable);
-//   return [value, refertable];
-// }
-
 function checkMasterRange() {
   var numOfSlaves = document.getElementById("numberOfSlaves").value;
   if (numOfSlaves != "") {
@@ -530,7 +445,9 @@ function checkMasterRange() {
         var changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        var hopDist = document.querySelector(`#Distance${i}1`).innerHTML;
+        var hopDist = $(`#Distance${i}1`).html();
+        var masterBeamwidth = parseInt($("#masterRadio").val().split(",")[1]);
+
         // checking if the changed angle will make a change to the txpower and the calculations followed
 
         calculateTx(changedAngle, i);
@@ -543,25 +460,37 @@ function checkMasterRange() {
         var upVerticalRange = Math.tan((5 * Math.PI) / 180) * hopDist;
         upVerticalRange = (upVerticalRange * 1000).toFixed(3);
         var belowVerticalRange = -upVerticalRange;
-        console.log(upVerticalRange, belowVerticalRange);
-        // document.getElementById(`slave${i}V Range`).innerHTML =  upVerticalRange + "," + belowVerticalRange;
+        var halfBeam = masterBeamwidth / 2;
+        var upperRightLimit = halfBeam;
+        var upperLeftLimit = 360;
+        var lowerRightLimit = 0;
+        var lowerLeftLimit = 360 - halfBeam;
+        console.log(
+          upperRightLimit,
+          upperLeftLimit,
+          lowerRightLimit,
+          lowerLeftLimit
+        );
+
         if (
-          (changedAngle < 360 && changedAngle > 330) ||
-          (changedAngle > 0 && changedAngle < 30)
+          (changedAngle < upperLeftLimit && changedAngle > lowerLeftLimit) ||
+          (changedAngle > lowerRightLimit && changedAngle < upperRightLimit)
         ) {
+          document.querySelector(`#Azimuth${i}1`).style.color = "Green";
           if (hopDist <= 5) {
             document.getElementById(`In Range${i}1`).innerHTML = "Yes";
             document.querySelector(`#Distance${i}1`).style.color = "Green";
-            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
+            polyLine[i].setOptions({ strokeColor: "Green" });
           } else {
             document.getElementById(`In Range${i}1`).innerHTML = "No";
             document.querySelector(`#Distance${i}1`).style.color = "Red";
-            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
+            polyLine[i].setOptions({ strokeColor: "Red" });
           }
         } else {
           document.getElementById(`In Range${i}1`).innerHTML = "No";
           document.querySelector(`#Azimuth${i}1`).style.color = "Red";
           document.querySelector(`#Distance${i}1`).style.color = "Black";
+          polyLine[i].setOptions({ strokeColor: "Red" });
         }
       }
     }
