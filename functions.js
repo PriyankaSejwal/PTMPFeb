@@ -1,5 +1,6 @@
 // Global Variables
 var masterAzimuthArray = [];
+var polyLine = [];
 var refertable, noisefloor;
 window.onload = checkBandwidth();
 
@@ -69,6 +70,7 @@ function createSlavesCoordinateField() {
     for (let i = 1; i < numOfCol; i++) {
       if (marker != "") {
         marker[i].setMap(null);
+        polyLine[i].setMap(null);
       }
     }
   }
@@ -102,6 +104,7 @@ function createSlavesCoordinateField() {
         // }
         if (marker[i] != null) {
           marker[i].setMap(null);
+          polyLine[i].setMap(null);
         }
         var coordslave = this.value.split(",");
         var [lat, long] = coordslave;
@@ -114,6 +117,13 @@ function createSlavesCoordinateField() {
         });
         bounds.extend({ lat: parseFloat(lat), lng: parseFloat(long) });
         map.fitBounds(bounds);
+
+        // PolyLine
+        polyLine[i] = new google.maps.Polyline({
+          map: map,
+          path: [masterMarker.getPosition(), marker[i].getPosition()],
+          strokOpacity: 0.8,
+        });
 
         // calling the function which calculates the parameters
         azimuth(parseFloat(lat), parseFloat(long), i);
@@ -389,10 +399,21 @@ function calculateTx(angle, i) {
   var slaveTx = parseFloat($(`#slave${i}Tx`).val());
   var hopDist = parseFloat($(`#Distance${i}1`).html());
   var cf = $("#channelFreq").val();
+  var masterBeamwidth = parseInt($("#masterRadio").val().split(",")[1]);
   console.log(mRadio, masterTx, slaveGain, hopDist, cf);
+  // upper lower limits of the angle on right and left side
+  var halfBeam = masterBeamwidth / 2;
+  var rightUpperLimit = halfBeam;
+  var rightLowerLimit = halfBeam - 5;
+  var leftLowerLimit = 360 - halfBeam;
+  var leftUpperLimit = leftLowerLimit + 5;
+  console.log(rightLowerLimit, rightUpperLimit, leftLowerLimit, leftUpperLimit);
 
   // Changing gain based on the angle
-  if ((angle >= 330 && angle <= 335) || (angle >= 25 && angle <= 30)) {
+  if (
+    (angle >= leftLowerLimit && angle <= leftUpperLimit) ||
+    (angle >= rightLowerLimit && angle <= rightUpperLimit)
+  ) {
     var mRadio = mRadio * 0.2;
   }
   var eirpVal = [
@@ -424,7 +445,9 @@ function checkMasterRange() {
         var changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        var hopDist = document.querySelector(`#Distance${i}1`).innerHTML;
+        var hopDist = $(`#Distance${i}1`).html();
+        var masterBeamwidth = parseInt($("#masterRadio").val().split(",")[1]);
+
         // checking if the changed angle will make a change to the txpower and the calculations followed
 
         calculateTx(changedAngle, i);
@@ -437,25 +460,37 @@ function checkMasterRange() {
         var upVerticalRange = Math.tan((5 * Math.PI) / 180) * hopDist;
         upVerticalRange = (upVerticalRange * 1000).toFixed(3);
         var belowVerticalRange = -upVerticalRange;
-        console.log(upVerticalRange, belowVerticalRange);
-        // document.getElementById(`slave${i}V Range`).innerHTML =  upVerticalRange + "," + belowVerticalRange;
+        var halfBeam = masterBeamwidth / 2;
+        var upperRightLimit = halfBeam;
+        var upperLeftLimit = 360;
+        var lowerRightLimit = 0;
+        var lowerLeftLimit = 360 - halfBeam;
+        console.log(
+          upperRightLimit,
+          upperLeftLimit,
+          lowerRightLimit,
+          lowerLeftLimit
+        );
+
         if (
-          (changedAngle < 360 && changedAngle > 330) ||
-          (changedAngle > 0 && changedAngle < 30)
+          (changedAngle < upperLeftLimit && changedAngle > lowerLeftLimit) ||
+          (changedAngle > lowerRightLimit && changedAngle < upperRightLimit)
         ) {
+          document.querySelector(`#Azimuth${i}1`).style.color = "Green";
           if (hopDist <= 5) {
             document.getElementById(`In Range${i}1`).innerHTML = "Yes";
             document.querySelector(`#Distance${i}1`).style.color = "Green";
-            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
+            polyLine[i].setOptions({ strokeColor: "Green" });
           } else {
             document.getElementById(`In Range${i}1`).innerHTML = "No";
             document.querySelector(`#Distance${i}1`).style.color = "Red";
-            document.querySelector(`#Azimuth${i}1`).style.color = "Green";
+            polyLine[i].setOptions({ strokeColor: "Red" });
           }
         } else {
           document.getElementById(`In Range${i}1`).innerHTML = "No";
           document.querySelector(`#Azimuth${i}1`).style.color = "Red";
           document.querySelector(`#Distance${i}1`).style.color = "Black";
+          polyLine[i].setOptions({ strokeColor: "Red" });
         }
       }
     }

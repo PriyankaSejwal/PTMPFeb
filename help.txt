@@ -10,102 +10,33 @@ Master Height - masterHeight
 
 Number of Slaves - numberOfSlaves
 
-  <!-- Second Section -->
-          <div class="section">
-            <!-- ITEM for number of SLAVES -->
-            <div class="item">
-              <label for="" class="label">Slaves</label>
-              <select
-                name=""
-                id="numberOfSlaves"
-                class="select"
-                onchange="createSlavesField()"
-              >
-                <option value="Number of Slaves" disabled selected>
-                  Number of Slaves
-                </option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-              </select>
-            </div>
-            <!-- ITEM for Bandwidth -->
-            <div class="item">
-              <label for="" class="label">Bandwidth</label>
-              <select
-                name=""
-                id="channelBW"
-                class="select"
-                onchange="checkBandwidth()"
-              >
-                <option value="Channel Bandwidth" disabled selected>
-                  Channel Bandwidth
-                </option>
-                <option value="10">10</option>
-                <option value="20" selected>20</option>
-                <option value="40">40</option>
-                <option value="80">80</option>
-              </select>
-            </div>
-            <!-- ITEM for Channel Frequency -->
-            <div class="item">
-              <label for="" class="label">Frequency</label>
-              <select name="" id="channelFreq" class="select"></select>
-            </div>
-          </div>
+ Latest Developments - 
+09-02-2023  Slaves which are at the corner of the beamwidth of Master(5 degree both sides) RSL for such slaves
+ depletes because only 20% antenna gain from Master remains for the slaves that are at the end 5 degree of the
+Master beam.
+16-02-2023  Weighted throughput for all the slaves calculation have been included.
 
+This week -
+20-02-2023 Master calculations were included.
+Master and slave table resets when num of slaves changed. Markers are removed when number of slaves changed.
+Table css were improved for better looks.
+Master and Slaves input fields placements changed. Gain kept right after the Radio Type foolowed by Tx power, Height.
+Height value have been put to 0 for both Master and slave.
 
+23-02-2023
+Added all the Radios properly under their groups.
+Now, external radio seletion makes gain go 0. User inputs then calculations happen.
+Slave Gain change and Master tx change active now.
 
+24-02-2023
+When CPE model is selected throughput is limited to Max 300.
 
-           <div class="miscSection">
-          <div class="sectionBorder">
-            <div class="subSection">
-              <!-- ITEM FOR NUMBER OF SLAVES -->
-              <div class="item">
-                <label class="label">Slaves</label>
-                <select
-                  name=""
-                  id="numberOfSlaves"
-                  class="select"
-                  onchange="createSlavesField()"
-                >
-                  <option value="Number of Slaves" disabled selected>
-                    Number of Slaves
-                  </option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </select>
-              </div>
-              <!-- ITEM FOR BANDWIDTH -->
-              <div class="item">
-                <label for="" class="label">Channel Bandwidth</label>
-                <select
-                  name=""
-                  id="channelBW"
-                  class="select"
-                  onchange="checkBandwidth()"
-                >
-                  <option value="Channel Bandwidth" disabled selected>
-                    Channel Bandwidth
-                  </option>
-                  <option value="10">10</option>
-                  <option value="20" selected>20</option>
-                  <option value="40">40</option>
-                  <option value="80">80</option>
-                </select>
-              </div>
-              <!-- ITEM FOR CHANNEL FREQUENCY -->
-              <div class="item">
-                <label for="" class="label">Channel Frequency</label>
-                <select name="" id="channelFreq" class="select"></select>
-              </div>
-            </div>
-          </div>
-        </div>
+This week 28-02-2023 to 03-03-2023
+
+28-02-2023
+Master Radios : when ion4l2BTS is selected the Master beamwidth consideration is 90 in calculations.
+When ion4l1BTS is selected MAster beamwidth considered is 60 degrees.
+
+01-03-2023
+Polyline between the Marker with Green/Red indicating whether the slave is in Master BeamWidth
+(60 for ion4l2BTs and 90 for ion4l1BTS) range and Distance(5 Km) or not.

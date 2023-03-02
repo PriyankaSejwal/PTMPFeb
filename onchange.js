@@ -16,13 +16,12 @@ function checkAngle() {
 // when Master Radio changes
 
 function masterRadioChanged() {
-  console.log("masterRadioChange function called");
   // slavesinput is the div which contains the slaves, will check if it is empty or not to prceed
-  slavesinput = document.getElementById("slavesInput").innerHTML;
+  slavesinput = $("#slavesInput").html();
   // master radio changed so gain chagnes
-  var masterGain = parseFloat(document.querySelector("#masterRadio").value);
-  // populating the gain field with new gain
-  document.querySelector("#masterAntGain").value = masterGain;
+  var masterGain = parseFloat($("#masterRadio").val().split(",")[0]);
+  // populating the Master gain field with new gain
+  $("#masterAntGain").val(masterGain);
   if (slavesinput != "") {
     var numOfSlaves = document.querySelector("#numberOfSlaves").value;
     var masterAngle = parseFloat($("#masterAngle").val());
@@ -32,8 +31,7 @@ function masterRadioChanged() {
         changedAngle = parseFloat(
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
-        calculateTx(changedAngle, i);
-        calcSNR(i);
+        slaveInMasterRange(changedAngle, i);
       } else {
         continue;
       }
@@ -57,25 +55,6 @@ function masterTxChange() {
           (masterAzimuthArray[i - 1] - masterAngle + 360) % 360
         );
         calculateTx(changedAngle, i);
-        // var slaveGain = parseFloat(
-        //   document.querySelector(`#slave${i}Radio`).value
-        // );
-        // var slaveTxPower = parseFloat(
-        //   document.getElementById(`slave${i}Tx Power`).value
-        // );
-        // var hopDist = parseFloat(
-        //   document.querySelector(`#slave${i}Distance`).innerHTML
-        // );
-        // rsl = (
-        //   masterGain +
-        //   masterTx +
-        //   slaveGain -
-        //   4 -
-        //   (20 * Math.log10(hopDist) + 20 * Math.log10(frequency / 1000) + 92.45)
-        // ).toFixed(2);
-
-        // // populating the RSL value in the slave field
-        // document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
         calcSNR(i);
       } else {
         continue;
@@ -160,6 +139,13 @@ function calcSNR(i) {
     document.querySelector(`#FEC${i}${j}`).innerHTML = fec;
     document.getElementById(`Link Rate${i}${j}`).innerHTML = linkrate;
     document.querySelector(`#Throughput${i}${j}`).innerHTML = throughput;
+    // Check for Radio if from CPE group
+    if ($(`#slave${i}Radio option:selected`).html().includes("CPE")) {
+      console.log("CPE Radio");
+      if (throughput > 300) {
+        $(`#Throughput${i}${j}`).html(300);
+      }
+    }
   }
   // calling function which will calculate the ptmp throughput
   throughputPTMP();
