@@ -132,21 +132,30 @@ function calcSNR(i) {
       }
     }
     document.querySelector(`#SNR${i}${j}`).innerHTML = snr;
+    $(`#reportSlave${i}SNR${j}`).html(snr);
     document.getElementById(`Fade Margin${i}${j}`).innerHTML =
       fademargin.toFixed(2);
+    $(`#reportSlave${i}FadeMargin${j}`).html(fademargin.toFixed(2));
     document.querySelector(`#MCS${i}${j}`).innerHTML = mcs;
+    $(`#reportSlave${i}MCS${j}`).html(mcs);
     document.querySelector(`#Modulation${i}${j}`).innerHTML = modulation;
+    $(`#reportSlave${i}Modulation${j}`).html(modulation);
     document.querySelector(`#FEC${i}${j}`).innerHTML = fec;
+    $(`#reportSlave${i}FEC${j}`).html(fec);
     document.getElementById(`Link Rate${i}${j}`).innerHTML = linkrate;
+    $(`#reportSlave${i}LinkRate${j}`).html(linkrate);
     document.querySelector(`#Throughput${i}${j}`).innerHTML = throughput;
+    $(`#reportSlave${i}Throughput${j}`).html(throughput);
     // Check for Radio if from CPE group
     if ($(`#slave${i}Radio option:selected`).html().includes("CPE")) {
       console.log("CPE Radio");
       if (throughput > 300) {
         $(`#Throughput${i}${j}`).html(300);
+        $(`#reportSlave${i}Throughput${j}`).html(300);
       }
     }
   }
+  availability(i);
   // calling function which will calculate the ptmp throughput
   throughputPTMP();
 }

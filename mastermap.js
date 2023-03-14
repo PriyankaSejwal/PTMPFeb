@@ -1,4 +1,4 @@
-var map, bounds, masterMarker;
+var map, reportMap, bounds, reportbounds, masterMarker;
 function initMap() {
   var options = {
     zoom: 12,
@@ -6,6 +6,12 @@ function initMap() {
   };
   map = new google.maps.Map(document.getElementById("map"), options);
   bounds = new google.maps.LatLngBounds();
+  // Installation Report Map
+  reportMap = new google.maps.Map(
+    document.querySelector("#reportmap"),
+    options
+  );
+  reportbounds = new google.maps.LatLngBounds();
 }
 
 function placeMasterOnMap() {
@@ -20,14 +26,22 @@ function placeMasterOnMap() {
   if (masterMarker != null) {
     masterMarker.setMap(null);
   }
-  masterMarker = new google.maps.Marker({
+  marker[0] = new google.maps.Marker({
     map: map,
+    position: pos,
+    icon: image,
+  });
+  reportmarker[0] = new google.maps.Marker({
+    map: reportMap,
     position: pos,
     icon: image,
   });
   console.log(masterMarker);
   bounds.extend(pos);
   map.fitBounds(bounds);
+
+  reportbounds.extend(pos);
+  reportMap.fitBounds(reportbounds);
 
   // function which when called will check if slave co-ord details are there
   // then will recalculate everything with new master co-ordinates

@@ -1,6 +1,8 @@
 // Global Variables
 var masterAzimuthArray = [];
 var polyLine = [];
+var reportPolyline = [];
+var marker = [];
 var refertable, noisefloor;
 window.onload = checkBandwidth();
 
@@ -70,8 +72,13 @@ function createSlavesCoordinateField() {
     for (let i = 1; i < numOfCol; i++) {
       if (marker != "") {
         marker[i].setMap(null);
+        reportmarker[i].setMap(null);
         polyLine[i].setMap(null);
+        reportpolyline[i].setMap(null);
       }
+      // Removing columns of Slaves in Installation Report
+      $(`#slave${i}Row1`).remove();
+      $(`#slave${i}Row2`).remove();
     }
   }
   for (let i = 1; i <= numOfCoordFields; i++) {
@@ -105,6 +112,8 @@ function createSlavesCoordinateField() {
         if (marker[i] != null) {
           marker[i].setMap(null);
           polyLine[i].setMap(null);
+          reportmarker[i].setMap(null);
+          reportpolyline.setMap(null);
         }
         var coordslave = this.value.split(",");
         var [lat, long] = coordslave;
@@ -118,12 +127,27 @@ function createSlavesCoordinateField() {
         bounds.extend({ lat: parseFloat(lat), lng: parseFloat(long) });
         map.fitBounds(bounds);
 
+        // Report Marker
+        reportmarker[i] = new google.maps.Marker({
+          map: reportMap,
+          position: { lat: parseFloat(lat), lng: parseFloat(long) },
+          icon: `images/${i}.png`,
+        });
+
         // PolyLine
         polyLine[i] = new google.maps.Polyline({
           map: map,
-          path: [masterMarker.getPosition(), marker[i].getPosition()],
+          path: [marker[0].getPosition(), marker[i].getPosition()],
           strokOpacity: 0.8,
         });
+
+        // Report polyline
+        reportPolyline[i] = new google.maps.Polyline({
+          map: reportMap,
+          path: [marker[0].getPosition(), marker[i].getPosition()],
+          strokeOpacity: 0.4,
+        });
+        reportbounds.extend({ lat: parseFloat(lat), lng: parseFloat(long) });
 
         // calling the function which calculates the parameters
         azimuth(parseFloat(lat), parseFloat(long), i);
@@ -220,7 +244,7 @@ function createSlavesField() {
     $(`#slave${i}Gain`).val(23);
     $(`#slave${i}Gain`).prop("disabled", true);
     $(`#slave${i}Tx`).val(27);
-    $(`#slave${i}Height`).val(0);
+    $(`#slave${i}Height`).val(10);
 
     // function called to create slave output fields
     createOutputTables(
@@ -272,6 +296,11 @@ function createSlavesField() {
       }
     });
 
+    // Event Listener which gets truggered when height is changed for Slave
+    $(`#slave${i}Height`).change(function () {
+      availability(i);
+    });
+
     // Third event listener to change the parameters when tx power will change
     // This will not impact the calculations for the slave as slave tx power is used to calculate the rsl of Master
     $(`#slave${i}Tx`).change(function () {
@@ -303,22 +332,36 @@ function createOutputTables(
     ["MCS", "Modulation"],
     ["FEC", "Link Rate"],
     ["Throughput", "PTMP Throughput"],
-    ["In Range"],
+    ["Link Availability", "In Range"],
   ];
-  $("<table>", { id: `slave${i}Table`, class: "table" }).appendTo(
-    $(`#tableDiv${i}`)
-  );
+  var unitsArray = [
+    [" Km", " m"],
+    ["°", " dBm"],
+    [" dB", " dB"],
+    ["", ""],
+    ["", " Mbps"],
+    [" Mbps", " Mbps"],
+    ["%", ""],
+  ];
+  $("<table>", {
+    id: `slave${i}Table`,
+    class: "table",
+  }).appendTo($(`#tableDiv${i}`));
+  $("<tbody>").appendTo(`#slave${i}Table`);
   for (let k = 0; k < tableArr.length; k++) {
-    $("<tr>").appendTo($(`#slave${i}Table`));
+    $("<tr>").appendTo($(`#slave${i}Table tbody`));
     for (let j = 0; j <= 1; j++) {
       $("<th>", { html: tableArr[k][j] }).appendTo(
         $(`#slave${i}Table tr:nth-child(${k + 1})`)
       );
-      $("<td>", {
+      $("<span>", {
         id: tableArr[k][j] + `${i}1`,
-        class: `reset${i}1`,
-        html: "hello",
-      }).appendTo($(`#slave${i}Table tr:nth-child(${k + 1})`));
+      }).appendTo(
+        $("<td>").appendTo($(`#slave${i}Table tr:nth-child(${k + 1})`))
+      );
+      $("<span>", { html: unitsArray[k][j] }).appendTo(
+        $(`#slave${i}Table tr:nth-child(${k + 1}) td:nth-of-type(${j + 1})`)
+      );
     }
   }
   // slaveSectionBorder.append(slaveInputSection);
@@ -363,6 +406,8 @@ function azimuth(slavelat, slavelong, i) {
   var distance = Math.round(R * c * 100) / 100; // Distance in km
   // Populating the value of distance
   document.querySelector(`#Distance${i}1`).innerHTML = distance;
+  $(`#reportSlave${i}Distance0`).html(distance);
+  $(`#reportSlave${i}Distance1`).html(distance);
 
   // Azimuth Calculation
   var y = Math.sin(slaveLong - masterLong) * Math.cos(slaveLat);
@@ -383,8 +428,12 @@ function azimuth(slavelat, slavelong, i) {
 
   //  Populating values if azimuth, hop distance and fresnel
   document.querySelector(`#Azimuth${i}0`).innerHTML = anglea;
+  $(`#reportSlave${i}Azimuth0`).html(anglea);
   document.querySelector(`#Azimuth${i}1`).innerHTML = angleb;
+  $(`#reportSlave${i}Azimuth1`).html(angleb);
   document.getElementById(`Fresnel Radius${i}1`).innerHTML = fres;
+  $(`#reportSlave${i}Fresnel0`).html(fres);
+  $(`#reportSlave${i}Fresnel1`).html(fres);
   // document.querySelector(`#slave${i}RSL`).innerHTML = rsl;
 
   // function called to check whether slave is in Master Range
@@ -432,7 +481,8 @@ function calculateTx(angle, i) {
     console.log("RSLs: ", rsl);
 
     //  Populating the value of RSL
-    document.querySelector(`#RSL${i}${j}`).innerHTML = rsl.toFixed(2);
+    $(`#RSL${i}${j}`).html(rsl.toFixed(2));
+    $(`#reportSlave${i}RSL${j}`).html(rsl.toFixed(2));
   }
 }
 
@@ -487,10 +537,16 @@ function checkMasterRange() {
             polyLine[i].setOptions({ strokeColor: "Red" });
           }
         } else {
-          document.getElementById(`In Range${i}1`).innerHTML = "No";
           document.querySelector(`#Azimuth${i}1`).style.color = "Red";
-          document.querySelector(`#Distance${i}1`).style.color = "Black";
+          document.getElementById(`In Range${i}1`).innerHTML = "No";
+          document.getElementById(`In Range${i}1`).style.color = "Red";
           polyLine[i].setOptions({ strokeColor: "Red" });
+          reportPolyline[i].setOptions({ strokeColor: "Red" });
+          if (hopDist <= 5) {
+            document.querySelector(`#Distance${i}1`).style.color = "Green";
+          } else {
+            document.querySelector(`#Distance${i}1`).style.color = "Red";
+          }
         }
       }
     }
@@ -525,3 +581,44 @@ function throughputPTMP() {
 
   console.log(weightedThroughputArr);
 }
+
+function availability(i) {
+  var masterHeight = parseFloat($("#masterHeight").val());
+  var slaveHeight = parseFloat($(`slave${i}Height`).val());
+  var linkDistance = parseFloat($(`#Distance${i}1`).html());
+  var freq = parseFloat($("#channelFreq").val());
+  var fadeMarginM = parseFloat(
+    document.getElementById(`Fade Margin${i}0`).innerHTML
+  );
+  var fadeMarginS = parseFloat(
+    document.getElementById(`Fade Margin${i}1`).innerHTML
+  );
+  var minFadeMargin = Math.min(fadeMarginM, fadeMarginS);
+  var climateFactor = 0.5;
+  var terrainFactor = 4;
+  var outageDueToFading =
+    terrainFactor *
+    climateFactor *
+    6 *
+    Math.pow(10, -7) *
+    (freq / 1000) *
+    Math.pow(linkDistance, 3) *
+    Math.pow(10, -(minFadeMargin / 10));
+
+  var linkAvailability = 100 * (1 - 2 * outageDueToFading);
+  console.log(linkAvailability);
+  document.getElementById(`Link Availability${i}1`).innerHTML =
+    linkAvailability.toFixed(6);
+  $(`#reportSlave${i}Availability0`).html(linkAvailability.toFixed(6));
+  $(`#reportSlave${i}Availability1`).html(linkAvailability.toFixed(6));
+}
+
+$("#reportButton").click(function () {
+  $(".popup").fadeIn();
+  $(".mainContainer").fadeOut();
+});
+
+$("#close-btn").click(function () {
+  $(".popup").fadeOut();
+  $(".mainContainer").fadeIn();
+});

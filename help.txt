@@ -40,3 +40,25 @@ When ion4l1BTS is selected MAster beamwidth considered is 60 degrees.
 01-03-2023
 Polyline between the Marker with Green/Red indicating whether the slave is in Master BeamWidth
 (60 for ion4l2BTs and 90 for ion4l1BTS) range and Distance(5 Km) or not.
+
+Upto 11 slaves possible now.
+
+06 and 07 feb
+Working on Installation report.
+
+09-03-2023
+Installation Report layout is coming without any data just plain tables.
+In installation report, we now have map and statistics information.
+
+10-03-2023
+In map, Markers and polyline now is visible.
+Link Summary Information is populated.
+When number of slaves are changed, then the js created divs for the link report gets deleted,
+in order to allow new elements to be created. 
+
+13-03-2023
+Included units to the tables for Master and slave parameters.
+Polyline Red/ Green in Report done.
+Bandwidth and frequency values swapped as previously they were coming interchanged.
+Representation : Slave {number} Summary in Report.
+Print report is possible.

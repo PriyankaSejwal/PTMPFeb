@@ -1,0 +1,203 @@
+/* Report CSS */
+.popup {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  justify-content: center;
+  align-items: center;
+}
+.content {
+  width: 100%;
+  background-color: #e6e7e8;
+}
+.reportheader {
+  display: block;
+  padding: 0 60px;
+  border-bottom: 0.1em solid #e6e6e6;
+  background-color: #fff;
+}
+.modal-title {
+  font-size: 18px;
+  line-height: 80px;
+  margin: 0;
+  font-weight: 600;
+  color: #350964;
+}
+.modal-small-title {
+  font-size: 14px;
+  line-height: 80px;
+  margin: 0;
+  font-weight: 500;
+  color: #350964;
+}
+.modal-control {
+  float: right;
+  padding: 1px 10px 0;
+  color: #350964;
+  cursor: pointer;
+}
+.modal-control .export {
+  appearance: none;
+  color: #350964;
+  padding: 5px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  width: 100%;
+  font-weight: 500;
+  padding: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
+  border: 1px solid #d6d6d6;
+  border-radius: 3px;
+  height: 30px;
+  background-image: url(images/angle-down-solid.svg);
+  background-repeat: no-repeat;
+  background-position: calc(100% - 8px) 50%;
+  background-size: 15px 15px;
+  letter-spacing: 0.05em;
+}
+.mpdal-control .export option {
+  color: #350964;
+  padding-right: 5px;
+}
+.modal-control select:focus,
+.modal-control select:active {
+  outline: none;
+}
+.modal-control select option {
+  color: #350964;
+  padding-right: 10px;
+}
+
+.modal-body {
+  background-color: #e6e7e8;
+  padding: 20px;
+}
+.report-content {
+  background-color: #fff;
+  overflow: hidden;
+  display: block;
+  padding: 20px;
+  border: 1px solid #e3e3e3;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 5%);
+  margin-bottom: 20px;
+  width: 100%;
+}
+.heading {
+  text-align: left;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-bottom: 10px;
+  height: 20px;
+  font-family: "Times New Roman", Times, serif;
+  color: #350964;
+  text-transform: uppercase;
+  line-height: 0.57;
+  /* margin: 0 10px; */
+}
+
+.report-holder table {
+  margin-bottom: 10px;
+  width: 100%;
+  overflow: hidden;
+  background-color: #fafafa;
+  border-spacing: 0;
+  border-collapse: collapse;
+  display: table;
+}
+.report-holder tr {
+  border-top: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  height: 35px;
+  display: table-row;
+}
+.report-holder th {
+  vertical-align: middle;
+}
+.report-holder td {
+  font-weight: 500;
+  padding: 7px;
+  vertical-align: middle;
+  font-size: 13px;
+  color: #54585a !important;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+  .reportheader {
+    padding: 0 20px;
+  }
+}
+.comp-hide {
+  display: none;
+}
+
+/* Responsiveness added to the Report */
+@media screen and (max-width: 750px) {
+  .comp-hide {
+    display: block;
+  }
+  .mob-hide {
+    display: none;
+  }
+}
+
+/* Map */
+.report-map-container {
+  position: relative;
+  height: 91%;
+  width: 100%;
+  padding: 0;
+  top: 0;
+  left: 0;
+}
+.report-map-height {
+  height: 94%;
+}
+#reportmap {
+  position: absolute;
+  /* height: 100%; */
+  /* width: 100%;*/
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+@media print {
+  .print-hide {
+    display: none;
+  }
+  .print-display {
+    display: block;
+  }
+  .report-header {
+    margin: 0 auto;
+  }
+  .heading {
+    background: #e6e7e8 !important;
+    border-bottom: 1px solid black;
+    text-align: center;
+    padding: 13px;
+    height: 33px;
+  }
+  .popup .row {
+    display: block;
+  }
+  .report-holder {
+    width: 100%;
+  }
+  .report-map-height {
+    height: 450px;
+  }
+  #reportmap {
+    height: 100%;
+    width: 100%;
+    visibility: visible;
+  }
+}

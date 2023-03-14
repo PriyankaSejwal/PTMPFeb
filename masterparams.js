@@ -26,17 +26,27 @@ function slaveInMasterRange(changedAngle, i) {
     document.querySelector(`#Azimuth${i}1`).style.color = "Green";
     if (hopDist <= 5) {
       document.getElementById(`In Range${i}1`).innerHTML = "Yes";
+      document.getElementById(`In Range${i}1`).style.color = "Green";
       document.querySelector(`#Distance${i}1`).style.color = "Green";
       polyLine[i].setOptions({ strokeColor: "Green" });
+      reportPolyline[i].setOptions({ strokeColor: "Green" });
     } else {
       document.getElementById(`In Range${i}1`).innerHTML = "No";
+      document.getElementById(`In Range${i}1`).style.color = "Red";
       document.querySelector(`#Distance${i}1`).style.color = "Red";
       polyLine[i].setOptions({ strokeColor: "Red" });
+      reportPolyline[i].setOptions({ strokeColor: "Red" });
     }
   } else {
-    document.getElementById(`In Range${i}1`).innerHTML = "No";
     document.querySelector(`#Azimuth${i}1`).style.color = "Red";
-    document.querySelector(`#Distance${i}1`).style.color = "Black";
+    document.getElementById(`In Range${i}1`).innerHTML = "No";
+    document.getElementById(`In Range${i}1`).style.color = "Red";
     polyLine[i].setOptions({ strokeColor: "Red" });
+    reportPolyline[i].setOptions({ strokeColor: "Red" });
+    if (hopDist <= 5) {
+      document.querySelector(`#Distance${i}1`).style.color = "Green";
+    } else {
+      document.querySelector(`#Distance${i}1`).style.color = "Red";
+    }
   }
 }
